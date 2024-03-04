@@ -1,6 +1,7 @@
 from spacy_wrapper import Spacy
-from typing import List, Dict
+from typing import List, Tuple
 import numpy as np
+from pyLDAvis import prepared_data_to_html
 import pyLDAvis.lda_model
 from unidecode import unidecode
 from sklearn.decomposition import LatentDirichletAllocation
@@ -27,9 +28,9 @@ class LDA:
         )
         self.vectorizer = TfidfVectorizer()
         self.tfidf = self.vectorizer.fit_transform(self.tokens)
-        self.topics = self.learn_model()
+        self.html, self.topics = self.learn_model()
 
-    def learn_model(self) -> dict:
+    def learn_model(self) -> Tuple[str, dict]:
         W = self.model.fit_transform(self.tfidf)
         H = self.model.components_
         num_words = 10
@@ -41,9 +42,8 @@ class LDA:
         vis_data = pyLDAvis.lda_model.prepare(
             self.model, self.tfidf, self.vectorizer, R=7, mds="tsne"
         )
-        pyLDAvis.save_html(vis_data, "./outputs/lda_result.html")
-        print("LDA Visualization stored in lda_result.html")
-        return topics_dict
+        lda_html = prepared_data_to_html(vis_data)
+        return lda_html, topics_dict
 
 
 def tokenize(content: str, lang: str) -> List[str]:
