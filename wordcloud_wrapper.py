@@ -1,16 +1,15 @@
-from wordcloud import WordCloud
+from helpers import replace_spaces
 from typing import List
 import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 
 
-def save_wordcloud(wc: WordCloud, name: str = "wordcloud", ext: str = "jpg"):
-    wc.to_file(f"./{replace_spaces(name)}.{ext}")
-    print(f"Result stored in {replace_spaces(name)}.{ext}")
+def save_wordcloud(wc: WordCloud, name: str = "wordcloud", ext: str = "jpg") -> None:
+    wc.to_file(f"./outputs/{replace_spaces(name)}.{ext}")
+    print(f"Word cloud stored in {replace_spaces(name)}.{ext}")
 
 
-def create_wordcloud(words: List[str]):
-    all_words_str = " ".join(words)
-
+def create_wordcloud(words: List[str]) -> WordCloud:
     wordcloud_params = {
         "width": 1000,
         "height": 600,
@@ -18,9 +17,5 @@ def create_wordcloud(words: List[str]):
         "max_words": 200,
         "collocations": False,
     }
-    wordcloud = WordCloud(**wordcloud_params).generate(all_words_str)
+    wordcloud = WordCloud(**wordcloud_params).generate(" ".join(words))
     return wordcloud
-
-
-def replace_spaces(content: str, symbol: str = "_") -> str:
-    return content.replace(" ", symbol)

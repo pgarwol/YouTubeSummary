@@ -1,21 +1,21 @@
-from typing import List, Dict
-from unidecode import unidecode
 from spacy_wrapper import Spacy
+from typing import List, Dict
+import numpy as np
+import pyLDAvis.lda_model
+from unidecode import unidecode
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import TfidfVectorizer
-import pyLDAvis.lda_model
-import numpy as np
 
 
 class LDA:
-    n_topics = 10
+    _N_TOPICS = 5
 
     def __init__(self, content: str, lang: str):
         self.content = content
         self.lang = lang
         self.tokens = tokenize(content=self.content, lang=self.lang)
-        self.model = LatentDirichletAllocation(
-            n_components=self.n_topics,
+        self.model = LatentDirichletAllocation(  # TODO: Fine Tuning
+            n_components=self._N_TOPICS,
             max_iter=177,
             learning_method="online",
             learning_offset=104.73684210526315,
@@ -27,7 +27,7 @@ class LDA:
         )
         self.vectorizer = TfidfVectorizer()
         self.tfidf = self.vectorizer.fit_transform(self.tokens)
-        self.learn_model()
+        self.topics = self.learn_model()
 
     def learn_model(self) -> dict:
         W = self.model.fit_transform(self.tfidf)
@@ -39,17 +39,16 @@ class LDA:
         topics_dict = {num: topic_words for num, topic_words in enumerate(topic_words)}
 
         vis_data = pyLDAvis.lda_model.prepare(
-            self.model, self.tfidf, self.vectorizer, R=self.n_topics, mds="tsne"
+            self.model, self.tfidf, self.vectorizer, R=7, mds="tsne"
         )
-        pyLDAvis.save_html(vis_data, "./lda_result.html")
-        print("Result stored in lda_result.html")
+        pyLDAvis.save_html(vis_data, "./outputs/lda_result.html")
+        print("LDA Visualization stored in lda_result.html")
         return topics_dict
 
 
 def tokenize(content: str, lang: str) -> List[str]:
     spacy = Spacy(lang=lang)
     doc = spacy.nlp(content)
-
     tokens = [
         unidecode(token.lemma_).lower()
         for token in doc
@@ -58,5 +57,4 @@ def tokenize(content: str, lang: str) -> List[str]:
         and token.pos_ == "NOUN"
         and len(token.lemma_) > 2
     ]
-
     return tokens
