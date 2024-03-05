@@ -29,6 +29,7 @@ class LDA:
         self.vectorizer = TfidfVectorizer()
         self.tfidf = self.vectorizer.fit_transform(self.tokens)
         self.html, self.topics = self.learn_model()
+        self.summary = self.create_summary(topics=self.topics)
 
     def learn_model(self) -> Tuple[str, dict]:
         W = self.model.fit_transform(self.tfidf)
@@ -44,6 +45,9 @@ class LDA:
         )
         lda_html = prepared_data_to_html(vis_data)
         return lda_html, topics_dict
+
+    def create_summary(self, topics: dict) -> str:
+        pass
 
 
 def tokenize(content: str, lang: str) -> List[str]:

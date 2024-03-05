@@ -4,9 +4,11 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 
-def save_wordcloud(wc: WordCloud, name: str = "wordcloud", ext: str = "jpg") -> None:
-    wc.to_file(f"./outputs/{replace_invalid_chars(name)}.{ext}")
-    print(f"Word cloud stored in {replace_invalid_chars(name)}.{ext}")
+def save_wordcloud(wc: WordCloud, name: str = "wordcloud", ext: str = "jpg") -> str:
+    save_path = f"{replace_invalid_chars(name)}.{ext}"
+    wc.to_file(save_path)
+    print(f"Word cloud stored in {save_path}")
+    return save_path
 
 
 def create_wordcloud(words: List[str]) -> WordCloud:

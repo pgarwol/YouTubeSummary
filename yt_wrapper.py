@@ -14,18 +14,18 @@ class YT:
         self.length = str(datetime.timedelta(seconds=yt.length))
         self.views = yt.views
         self.rating = yt.rating
-        self.tags = yt.keywords
+        self.tags = ", ".join(yt.keywords)
 
         self.info = {
-            'Title': self.title,
-            'Author': self.author,
-            'Thumbnail': self.thumbnail,
-            'Length': self.length,
-            'Views': self.views,
-            'Rating': self.rating,
-            'Tags': self.tags
+            "Title": self.title,
+            "Author": self.author,
+            "Thumbnail": self.thumbnail,
+            "Length": self.length,
+            "Views": self.views,
+            "Rating": self.rating,
+            "Tags": self.tags,
         }
-        
+
         try:
             yt.bypass_age_gate()
             caption_xml = yt.captions[caption_lang].xml_captions
