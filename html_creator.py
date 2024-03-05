@@ -1,12 +1,16 @@
 from helpers import convert_nones
-from wordcloud import WordCloud
 import os
+from wordcloud import WordCloud
 
 
-def results_to_html(lda_vis, lda_topics, wordcloud_path: str, **info) -> None:
-    output_file_name = f"{info['Author']}.html"
+def results_to_html(lda_vis, wordcloud_path: str, **info) -> None:
+    for key, value in info.items():
+        if isinstance(value, str):
+            info[key] = value.encode("utf-8", "ignore").decode("utf-8")
+
+    output_file_name = f"result.html"
     file_path = os.path.join(os.getcwd(), output_file_name)
-
+    print(file_path)
     info["Rating"] = convert_nones(info["Rating"])
     info["Tags"] = convert_nones(info["Tags"])
     content = f"""
@@ -45,7 +49,7 @@ def results_to_html(lda_vis, lda_topics, wordcloud_path: str, **info) -> None:
                             <p>{info['Views']:,}</p>
                         </span>
                         <span class="stat">
-                            <i class="fa-regular fa-thumbs-up fa-lg"></i>
+                            <i class="fa-solid fa-thumbs-up fa-lg"></i>
                             <p>{info['Rating']}</p>
                         </span>
                         <span class="stat">
@@ -65,5 +69,5 @@ def results_to_html(lda_vis, lda_topics, wordcloud_path: str, **info) -> None:
         </body>
     </html>"""
 
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="utf-8") as file:
         file.write(content)

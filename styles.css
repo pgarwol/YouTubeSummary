@@ -99,6 +99,8 @@ div#wordcloud {
 
 /* LDA Visualization */
 div#output > div[id^="ldavis"] {
+    font-weight: bold;
+    font-style: normal;
     height: 800px;
     width: 1200px;
     border: 1px solid black;

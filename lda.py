@@ -1,15 +1,15 @@
 from spacy_wrapper import Spacy
 from typing import List, Tuple
 import numpy as np
-from pyLDAvis import prepared_data_to_html
 import pyLDAvis.lda_model
 from unidecode import unidecode
+from pyLDAvis import prepared_data_to_html
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class LDA:
-    _N_TOPICS = 5
+    _N_TOPICS = 3
 
     def __init__(self, content: str, lang: str):
         self.content = content
@@ -29,7 +29,6 @@ class LDA:
         self.vectorizer = TfidfVectorizer()
         self.tfidf = self.vectorizer.fit_transform(self.tokens)
         self.html, self.topics = self.learn_model()
-        self.summary = self.create_summary(topics=self.topics)
 
     def learn_model(self) -> Tuple[str, dict]:
         W = self.model.fit_transform(self.tfidf)
@@ -45,9 +44,6 @@ class LDA:
         )
         lda_html = prepared_data_to_html(vis_data)
         return lda_html, topics_dict
-
-    def create_summary(self, topics: dict) -> str:
-        pass
 
 
 def tokenize(content: str, lang: str) -> List[str]:
