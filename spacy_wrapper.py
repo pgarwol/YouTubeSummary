@@ -5,7 +5,7 @@ from spacy.lang.pl.stop_words import STOP_WORDS as pl_stopwords
 
 class Spacy:
     models = {
-        "pl": {"model": "pl-core-news-md", "stopwords": pl_stopwords},
+        "pl": {"model": "pl_core_news_md", "stopwords": pl_stopwords},
         "en": {"model": "en_core_web_md", "stopwords": en_stopwords},
     }
 

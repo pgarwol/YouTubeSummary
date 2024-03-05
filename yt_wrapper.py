@@ -2,6 +2,7 @@ import datetime
 from lda import LDA
 from pytube import YouTube
 from handle_captions import xml_to_str
+from helpers import remove_brackets_content
 
 
 class YT:
@@ -20,6 +21,7 @@ class YT:
             "Title": self.title,
             "Author": self.author,
             "Thumbnail": self.thumbnail,
+            "URL": self.url,
             "Length": self.length,
             "Views": self.views,
             "Rating": self.rating,
@@ -30,7 +32,7 @@ class YT:
             yt.bypass_age_gate()
             caption_xml = yt.captions[caption_lang].xml_captions
             caption_str = xml_to_str(caption_xml)
-            self.caption = caption_str
+            self.caption = remove_brackets_content(caption_str)
         except Exception as e:
             print(e)
             self.caption = None

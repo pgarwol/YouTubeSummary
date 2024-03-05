@@ -13,11 +13,12 @@ def save_wordcloud(wc: WordCloud, name: str = "wordcloud", ext: str = "jpg") -> 
 
 def create_wordcloud(words: List[str]) -> WordCloud:
     wordcloud_params = {
-        "width": 1000,
-        "height": 600,
+        "width": 1100,
+        "height": 800,
         "background_color": "white",
         "max_words": 200,
-        "collocations": False,
+        "collocations": True,
+        "min_font_size": 12,
     }
     wordcloud = WordCloud(**wordcloud_params).generate(" ".join(words))
     return wordcloud
