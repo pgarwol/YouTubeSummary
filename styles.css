@@ -6,7 +6,9 @@
     font-optical-sizing: auto;
     
 }
-
+html {
+    font-size: 24px;
+}
 /* Hide scrollbar for Chrome, Safari and Opera */
 *::-webkit-scrollbar {
     display: none;
@@ -56,7 +58,7 @@ div#info {
     color:white;
     font-weight: bold;
     font-style: normal;
-    text-shadow: 1px 1px 1px black;
+    text-shadow: 1.4px 1.4px 1.4px black;
 }
 
 span#stats {
@@ -73,12 +75,20 @@ span.stat {
     flex-direction: row;
     align-items: center;
 }
+span.title {
+    font-size: 1.6rem;
+}
+span.author {
+    font-size: 1.3rem
+}
+span.stat > p {
+    font-size: 1.1rem;
+}
 
 /* Icons */
 span.stat > i {
     margin-right: 15px;
 }
-
 
 /* - OUTPUT SECTION - */
 div#output {
@@ -95,6 +105,7 @@ div#wordcloud {
     height: 100vh;
     display: flex;
     align-items: center;
+    margin: 0 10px 0 10px;
 }
 
 /* LDA Visualization */
@@ -107,6 +118,7 @@ div#output > div[id^="ldavis"] {
     -webkit-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
     -moz-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
     box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 1);
+    margin: 0 10px 0 10px;
 }
 
 div[id^="ldavis"] {
