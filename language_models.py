@@ -8,9 +8,22 @@ from spacy.lang.it.stop_words import STOP_WORDS as it_stopwords
 
 
 class LanguageUnsupportedException(Exception):
-    def __init__(self, message="Language of this content is not supported"):
+    def __init__(self, message="Language of this content is not supported."):
         self.message = message
         super().__init__(self.message)
+
+
+def check_lang_support(language: str) -> bool:
+    """
+    Check if a given language is supported.
+
+    Parameters:
+    - language (str): The language code (e.g., "en", "pl", "nl").
+
+    Returns:
+    bool: True if the language is supported, False otherwise.
+    """
+    return language in list(lang_models.keys())
 
 
 lang_models = {

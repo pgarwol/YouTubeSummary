@@ -1,5 +1,5 @@
 from spacy_wrapper import Spacy
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import numpy as np
 import pyLDAvis.lda_model
 from unidecode import unidecode
@@ -26,11 +26,17 @@ class LDA:
             topic_word_prior=0.6684210526315789,
             n_jobs=-1,
         )
-        self.vectorizer = TfidfVectorizer()
+        self.vectorizer = TfidfVectorizer()  # TODO: Fine Tuning
         self.tfidf = self.vectorizer.fit_transform(self.tokens)
         self.html, self.topics = self.learn_model()
 
     def learn_model(self) -> Tuple[str, dict]:
+        """
+        Learns the LDA model and generates pyLDAvis visualization.
+
+        Returns:
+        Tuple[str, dict]: HTML representation of pyLDAvis and dictionary of top words for each topic.
+        """
         W = self.model.fit_transform(self.tfidf)
         H = self.model.components_
         num_words = 10
@@ -47,6 +53,16 @@ class LDA:
 
 
 def tokenize(content: str, lang: str) -> List[str]:
+    """
+    Tokenizes and preprocesses the input content.
+
+    Parameters:
+    - content (str): The input text content to be tokenized.
+    - lang (str): The language code for tokenization and stopwords.
+
+    Returns:
+    List[str]: Tokenized and preprocessed list of words.
+    """
     spacy = Spacy(lang=lang)
     doc = spacy.nlp(content)
     tokens = [

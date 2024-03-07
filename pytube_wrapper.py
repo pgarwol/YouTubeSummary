@@ -1,12 +1,12 @@
 from lda import LDA
-from helpers import remove_brackets_content, xml_to_str, detect_lang
+from helpers import remove_square_brackets, xml_to_str
+from pytube.exceptions import AgeRestrictedError, VideoUnavailable
+from language_models import LanguageUnsupportedException, check_lang_support
 import datetime
 from enum import Enum
-from pytube.exceptions import AgeRestrictedError, VideoUnavailable
 from typing import Tuple
-from pytube import YouTube, Caption
-from language_models import supported_languages, LanguageUnsupportedException
 from langdetect import detect
+from pytube import YouTube
 
 
 class Movie:
@@ -36,16 +36,18 @@ class Movie:
             self.status = Status.NEGATIVE_VIDEO_UNAVAILABLE
             return
 
+        print(self.__repr__())
+
         try:
             yt.bypass_age_gate()
 
-            caption_str, self.language = self.get_proper_captions(yt=yt)
-            self.caption = remove_brackets_content(caption_str)
+            captions, self.language = self.get_proper_captions(yt=yt)
+            self.captions = remove_square_brackets(captions)
             self.status = Status.POSITIVE
 
         except LanguageUnsupportedException:
             self.status = Status.NEGATIVE_LANG_UNSUPPORTED
-        except IndexError:
+        except NoCaptionsException:
             self.status = Status.NEGATIVE_NO_CAPTIONS
         except AgeRestrictedError:
             self.status = Status.NEGATIVE_AGE_RESTRICTED
@@ -59,12 +61,47 @@ Author:                    {self.author}
 Title | Url:               {self.title} | {self.url}
 Thumbnail:                 {self.thumbnail}
 Length | Views | Rating:   {self.length} | {self.views} | {self.rating}
-Tags:                      {self.tags}
-{150*'-'}"""
+Tags:                      {self.tags}"""
 
-    def get_proper_captions(self, yt: YouTube):
-        potential_country_codes = {}
-        potential_country_codes.update(
+    def get_proper_captions(self, yt: YouTube) -> Tuple[str, str]:
+        """
+        Fetches and processes captions, handling language detection and support.
+
+        Parameters:
+        - yt (YouTube): The YouTube video object.
+
+        Returns:
+        Tuple[str, str]: Processed captions and detected language code.
+        """
+        language_code = captions_code = self.get_captions_code(yt=yt)
+
+        if captions_code.startswith("a."):
+            language_code = captions_code[2:]
+            if not check_lang_support(language=language_code):
+                raise LanguageUnsupportedException
+
+        captions_xml = yt.captions[captions_code].xml_captions
+        captions = xml_to_str(captions_xml)
+
+        return captions, language_code
+
+    def get_captions_code(self, yt: YouTube) -> str:
+        """
+        Determines the appropriate captions code based on available options.
+
+        Parameters:
+        - yt (YouTube): The YouTube video object.
+
+        Returns:
+        str: The selected captions code.
+        """
+        captions_codes = {}
+        try:
+            captions_codes.update({"First": list(yt.captions.keys())[0].code})
+        except IndexError:
+            raise NoCaptionsException
+
+        captions_codes.update(
             {
                 "Auto-generated": next(
                     (
@@ -76,36 +113,22 @@ Tags:                      {self.tags}
                 )
             }
         )
-        potential_country_codes.update({"Title": detect(self.title)})
-        potential_country_codes.update({"First": list(yt.captions.keys())[0].code})
+        captions_codes.update({"Title": detect(self.title)})
+
         print(
-            f"""
-{150*'-'}
+            f"""{150*'-'}
 Sugested language codes:
-Title: {potential_country_codes["Title"]},
-Auto-generated: {potential_country_codes["Auto-generated"]}
-First: {potential_country_codes["First"]}
+First: {captions_codes["First"]},
+Auto-generated: {captions_codes["Auto-generated"]},
+Title: {captions_codes["Title"]}
 {150*'-'}"""
         )
-
-        #  CODES IMPORTANCE:
-        #  Auto-generated > Title > First
-        for code in potential_country_codes.values():
-            if code:
-                chosen_code = code
-                break
+        if captions_codes["Auto-generated"]:
+            return captions_codes["Auto-generated"]
+        elif captions_codes["Title"]:
+            return captions_codes["Title"]
         else:
-            chosen_code = None
-
-        caption_xml = yt.captions[chosen_code].xml_captions
-        caption_str = xml_to_str(caption_xml)
-        if chosen_code.startswith("a."):
-            chosen_code = chosen_code[2:]
-
-        if chosen_code not in supported_languages:
-            raise LanguageUnsupportedException
-
-        return caption_str, chosen_code
+            return captions_codes["First"]
 
 
 class Status(Enum):
@@ -114,3 +137,9 @@ class Status(Enum):
     NEGATIVE_NO_CAPTIONS = "Content does not contain captions."
     NEGATIVE_LANG_UNSUPPORTED = "Language of this content is not supported."
     NEGATIVE_VIDEO_UNAVAILABLE = "This video is unavailable."
+
+
+class NoCaptionsException(Exception):
+    def __init__(self, message="Content does not contain captions."):
+        self.message = message
+        super().__init__(self.message)

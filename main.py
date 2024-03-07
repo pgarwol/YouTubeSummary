@@ -1,14 +1,13 @@
 from lda import LDA
 from pytube_wrapper import Movie
-from wordcloud import WordCloud
 from wordcloud_wrapper import create_wordcloud, save_wordcloud
 from html_builder import generate_site
 
 
 def run() -> None:
-    movie = Movie(url="https://www.youtube.com/watch?v=W1Ah6UlvA2I")
+    movie = Movie(url="https://www.youtube.com/watch?v=QGj15uvuPLA")
     if movie.status.name == "POSITIVE":
-        lda = LDA(content=movie.caption, lang=movie.language)
+        lda = LDA(content=movie.captions, lang=movie.language)
         word_cloud = create_wordcloud(words=lda.tokens, lang=movie.language)
         word_cloud_path = save_wordcloud(wordcloud=word_cloud, ext="jpg")
         generate_site(

@@ -1,14 +1,17 @@
 from helpers import convert_nones
 from pytube_wrapper import Status
+from pathlib import Path
+from typing import Optional, Union
+from pyLDAvis import PreparedData
 
 
 class Site:
     def __init__(
         self,
         status: Status,
-        lda_vis=None,
-        wordcloud_path: str = None,
-        url: str = "site.html",
+        lda_vis: Optional[str] = None,
+        wordcloud_path: Optional[Union[str, Path]] = None,
+        url: Optional[str] = "site.html",
         **info,
     ):
         if info:
@@ -85,10 +88,33 @@ class Site:
                 {self.BODY}
             </html> """
 
-        self.URL = url
+        if url:
+            self.URL = Path(url)
 
 
-def generate_site(status: Status, lda_vis=None, wordcloud_path: str = None, **info):
+def generate_site(
+    status: Status,
+    lda_vis: Optional[str] = None,
+    wordcloud_path: Optional[Union[str, Path]] = None,
+    **info,
+) -> None:
+    """
+    Generate an HTML site with dynamic content based on the provided parameters.
+
+    Parameters:
+    - status (Status): The status of the site, indicating the current state.
+    - lda_vis (Optional[str]): The path to a topic modeling visualization (default: None).
+    - wordcloud_path (Optional[Union[str, Path]]): The path to a word cloud image (default: "wordcloud.jpg").
+    - **info (kwargs): Additional information for the site.
+
+    Returns:
+    None
+    """
+    if wordcloud_path is None:
+        wordcloud_path = Path("wordcloud.jpg")
+    if isinstance(wordcloud_path, str):
+        wordcloud_path = Path(wordcloud_path)
+
     for key, value in info.items():
         if isinstance(value, str):
             info[key] = value.encode("utf-8", "ignore").decode("utf-8")
