@@ -2,7 +2,6 @@ from helpers import convert_nones
 from pytube_wrapper import Status
 from pathlib import Path
 from typing import Optional, Union
-from pyLDAvis import PreparedData
 
 
 class Site:

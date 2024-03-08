@@ -5,7 +5,7 @@ from html_builder import generate_site
 
 
 def run() -> None:
-    movie = Movie(url="https://www.youtube.com/watch?v=QGj15uvuPLA")
+    movie = Movie(url="https://www.youtube.com/watch?v=gMvr826M7Xg")
     if movie.status.name == "POSITIVE":
         lda = LDA(content=movie.captions, lang=movie.language)
         word_cloud = create_wordcloud(words=lda.tokens, lang=movie.language)

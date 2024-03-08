@@ -23,7 +23,7 @@ def check_lang_support(language: str) -> bool:
     Returns:
     bool: True if the language is supported, False otherwise.
     """
-    return language in list(lang_models.keys())
+    return language in supported_languages
 
 
 lang_models = {
